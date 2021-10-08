@@ -4,6 +4,7 @@ import numpy as np
 from numpy import sin,cos,pi,abs
 from matplotlib.pyplot import plot, subplot, grid,show
 from matplotlib.pyplot import ylabel, xlabel,stem
+#chưa có 
 # sampling rate
 fs = 1000
 # sampling interval
