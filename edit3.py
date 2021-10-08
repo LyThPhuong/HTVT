@@ -13,15 +13,16 @@ t = np.arange(0,duration,ts)
 tc=np.arange(0,2*duration,ts)
 N= fs*duration
 #ngõ vào
-def ngovaocos():
-    A = float(input("Biên độ: "))
-    f = float(input("Tần số: ")) #KHz
-    x= A*cos(2*pi*f*t)
-    return(x,f)
-def ngovaosin():
-    A = float(input("Biên độ: "))
-    f = float(input("Tần số: ")) #KHz
-    x= A*sin(2*pi*f*t)
+def ngovao():
+    dang=input("")
+    if dang=="cos":
+        A = float(input("Biên độ: "))
+        f = float(input("Tần số: ")) #KHz
+        x= A*cos(2*pi*f*t)
+    if dang == "sin":
+        A = float(input("Biên độ: "))
+        f = float(input("Tần số: ")) #KHz
+        x= A*sin(2*pi*f*t)
     return(x,f)
 def biendoiFourier(x,n):
     X= (fft(x))/len(x)
@@ -67,13 +68,13 @@ def giaidieuche(Xf,fc,Ac):
 u = float(input("nguy ="))
 print("Hãy nhập các tín hiệu có tần số theo thứ tự tăng dần")
 n=2*N
-print("Tín hiệu x1(t)")
-x1,f1=ngovaocos()
+print("Tín hiệu x1(t) là",end='')
+x1,f1=ngovao()
 fc1=2*f1
 xc1,Ac1=dieucheAM(x1,fc1)
 Xc1,Fc1=biendoiFourier(xc1,N)
-print("Tín hiệu x2(t)")
-x2,f2=ngovaosin()
+print("Tín hiệu x2(t) là",end='')
+x2,f2=ngovao()
 fc2=fc1+ 2*f2 +5
 xc2,Ac2=dieucheAM(x2,fc2)
 Xc2,Fc2=biendoiFourier(xc2,N)

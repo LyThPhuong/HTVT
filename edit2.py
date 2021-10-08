@@ -13,6 +13,13 @@ t = np.arange(0,duration,ts)
 tc=np.arange(0,2*duration,ts)
 N= fs*duration
 #ngõ vào
+def noise():
+    #A=np.random.normal(0,5)
+    #f=np.random.normal(0,100)
+    A=10
+    f=10
+    nhieu=A*cos(2*pi*f*tc)
+    return(nhieu)
 def ngovaocos():
     A = float(input("Biên độ: "))
     f = float(input("Tần số: ")) #KHz
@@ -64,6 +71,7 @@ def giaidieuche(Xf,fc,Ac):
     songmang = Ac*cos(2*pi*fc*tc)
     yd=  xc *songmang 
     return(yd)
+#/////////////////////////////
 u = float(input("nguy ="))
 print("Hãy nhập các tín hiệu có tần số theo thứ tự tăng dần")
 n=2*N
@@ -77,7 +85,9 @@ x2,f2=ngovaosin()
 fc2=fc1+ 2*f2 +5
 xc2,Ac2=dieucheAM(x2,fc2)
 Xc2,Fc2=biendoiFourier(xc2,N)
-xc=xc1+xc2
+#bo cong
+nhieu=noise()
+xc=xc1+xc2+nhieu
 Xc,Fc=biendoiFourier(xc,n)
 subplot(421)
 plot(tc,xc)
@@ -103,4 +113,10 @@ Yl2,Ylsau2=LPF(Yd2,f2)
 Yl2,Ylsau2=BPF(Yl2,f2,0)
 subplot(426)
 plot(Fd2,abs(Yl2))
+xs1=biendoiFouriernguoc(Yl1)
+xs2=biendoiFouriernguoc(Yl2)
+subplot(427)
+plot(tc,xs1)
+subplot(428)
+plot(tc,xs2)
 show()
