@@ -13,12 +13,16 @@ t = np.arange(0,duration,ts)
 tc=np.arange(0,2*duration,ts)
 N= fs*duration
 #ngõ vào
-def noise():
-    #A=np.random.normal(0,5)
-    #f=np.random.normal(0,100)
-    A=10
-    f=10
-    nhieu=A*cos(2*pi*f*tc)
+def noise(n):
+    A=np.random.normal(0,5)
+    f=np.random.normal(0,100)
+    dang=np.random.choice(['sin','cos','so'])
+    if dang == 'sin':
+        nhieu=A*sin(2*pi*f*tc)
+    elif dang == 'cos':
+        nhieu=A*cos(2*pi*f*tc)
+    elif dang == 'so':
+        nhieu=np.random.normal(0,1,n)
     return(nhieu)
 def ngovaocos():
     A = float(input("Biên độ: "))
@@ -86,7 +90,7 @@ fc2=fc1+ 2*f2 +5
 xc2,Ac2=dieucheAM(x2,fc2)
 Xc2,Fc2=biendoiFourier(xc2,N)
 #bo cong
-nhieu=noise()
+nhieu=noise(n)
 xc=xc1+xc2+nhieu
 Xc,Fc=biendoiFourier(xc,n)
 subplot(421)
