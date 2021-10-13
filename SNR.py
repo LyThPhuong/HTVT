@@ -26,8 +26,9 @@ def noise():
         nhieu=A*cos(2*pi*f*tc)
         Nd = (A**2)/2
     elif dang == 'white':
-        nhieu=[1]*len(tc)
+        nhieu=A*cos(2*pi*0*tc)
         Nd=Gn*2*max(f1,f2)
+    print(dang)
     return(nhieu,Nd)
 def ngovaocos():
     A = float(input("Biên độ: "))
@@ -88,7 +89,7 @@ def giaidieuche(Xf,fc,Ac):
 #/////////////////////////////
 u = float(input("nguy ="))
 print("Hãy nhập các tín hiệu có tần số theo thứ tự tăng dần")
-n=3*N
+n=2*N
 print("Tín hiệu x1(t)")
 x1,f1,P1=ngovaocos()
 fc1=2*f1
@@ -103,11 +104,10 @@ Xc2,Fc2=biendoiFourier(xc2,N)
 nhieu,Nd=noise()
 Sd=Sd1+Sd2
 SNR = Sd/Nd
-print(SNR)
+print("SNR=",SNR)
 xc=xc1+xc2+nhieu
 Xc,Fc=biendoiFourier(xc,n)
 subplot(421)
-tc=2*tc
 plot(tc,xc)
 subplot(422)
 plot(Fc,abs(Xc))
