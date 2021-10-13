@@ -88,7 +88,7 @@ def giaidieuche(Xf,fc,Ac):
 #/////////////////////////////
 u = float(input("nguy ="))
 print("Hãy nhập các tín hiệu có tần số theo thứ tự tăng dần")
-n=2*N
+n=3*N
 print("Tín hiệu x1(t)")
 x1,f1,P1=ngovaocos()
 fc1=2*f1
@@ -107,6 +107,7 @@ print(SNR)
 xc=xc1+xc2+nhieu
 Xc,Fc=biendoiFourier(xc,n)
 subplot(421)
+tc=2*tc
 plot(tc,xc)
 subplot(422)
 plot(Fc,abs(Xc))
