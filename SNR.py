@@ -1,9 +1,9 @@
 from scipy.fft import fft,fftfreq,ifft
 import matplotlib.pyplot as plt
 import numpy as np
-from numpy import sin,cos,pi,abs
-from matplotlib.pyplot import plot, subplot, grid,show
-from matplotlib.pyplot import ylabel, xlabel,stem
+from numpy import sin,cos,pi,abs,power
+from matplotlib.pyplot import plot, subplot,show
+from matplotlib.pyplot import ylabel, xlabel
 # sampling rate
 fs = 5000
 # sampling interval
@@ -15,18 +15,13 @@ N= fs*duration
 Gn= 1e-10
 #ngõ vào
 def noise(f,tc):
-    A=np.random.normal(0,5)
-    fn=np.random.normal(0,100)
-    dang=np.random.choice(['sin','cos','white'])
-    if dang == 'sin':
-        nhieu=A*sin(2*pi*fn*tc)
-        Nd = (A**2)/2
-    elif dang == 'cos':
-        nhieu=A*cos(2*pi*fn*tc)
-        Nd = (A**2)/2
-    elif dang == 'white':
-        nhieu=A*cos(2*pi*0*tc)
-        Nd=Gn*2*max(f)
+    snr_lt=3 #db
+    k=float(1/(power(10,snr_lt/10)))
+    nhieu=np.random.normal(0,k*max(f),len(tc))
+    Noi=fft(nhieu)
+    Nd=0
+    for i in Noi:
+        Nd+=(abs(i))**2/len(Noi)
     return(nhieu,Nd)
 def ngovaocos():
     A = float(input("Biên độ: "))
@@ -40,7 +35,6 @@ def ngovaosin():
     x= A*sin(2*pi*f*t)
     P = (A**2)/2    #công suất TB
     return(x,f,P)
-
 def LPF(X,fcut):
     #X là tín hiệu cần lọc 
     #f= fftfreq(n,1/fs)
@@ -60,9 +54,9 @@ def giaidieuche(xc,fc):
     yd=  xc *songmang 
     return(yd)
 def SNR(Sd,Nd):
-    return(round(Sd/Nd,3))
+    return(10 * np.log10(Sd/Nd))
 def nhapngovao():
-    n = int(input("số tín hiệu cần ghép là: "))
+    n = int(input("Số tín hiệu cần ghép là: "))
     lstngovao=[]
     lsttanso=[]
     lstcongsuat=[]
@@ -83,8 +77,8 @@ def songmang(f):
     for i in range(1,len(f)):
         fc.append(fc[i-1]+2*f[i]+5)
     return(fc)
-def dieucheAM(x,fc,P):
-    A = float(input("Biên độ sóng mang: "))
+def dieuche(x,fc,P):
+    A = 20
     songmang = A*cos(2*pi*fc*t)
     xc=[None]*len(songmang)
     for i in range(0,len(xc)):
@@ -107,24 +101,40 @@ def BPF(X,fc,f):
     Xl[abs(fx)>(fc+f)]=0
     return(Xl)
 #main
-u = float(input("Hệ số điều chế u="))
+kieu=input("Chọn kiểu điều chế: ")
+if kieu=='AM' or kieu=='am':
+    u = float(input("Hệ số điều chế u="))
+elif kieu=='DSB' or kieu=='dsb':
+    u = 1
 x,f,P,n=nhapngovao()
 fc=songmang(f)
 mc=[None]*len(x)
 Pd=[None]*len(P)
 for i in range(0,len(x)):
-    mc[i],Pd[i]=dieucheAM(x[i],fc[i],P[i])
+    mc[i],Pd[i]=dieuche(x[i],fc[i],P[i])
 Sd=sum(Pd)
-xc=[]
+xb=[]
 tc=np.arange(0,n*duration,ts)
 nhieu,Nd=noise(f,tc)
 for i in range(0,len(mc)):
-    xc+=mc[i]
-xc+=nhieu
+    xb+=mc[i]
+xb+=nhieu
 Nc=n*N
-Xc,Fc=biendoiFourier(xc,Nc)
-#Xc=list(Xc)
-print(type(Xc),len(Xc))
+#điều chế chính cho khoảng băng truyền có f từ 100
+#so sánh các fc nếu chưa bằng 100 thì điều chế chính
+#nếu >= 100 thì điều chế chính vs fc=100
+xc=xb
+Pd=Sd
+for i in fc:
+    if i <100:
+        fcx=100
+    else:
+        fcx=max(fc)
+xc,Pd=dieuche(xb,fcx,Sd)
+tc=np.arange(0,duration,ts)
+Nc=N
+yc=giaidieuche(xc,fcx)
+Xc,Fc=biendoiFourier(yc,Nc)
 s=[]
 for i in range(0,n):
     Xl=BPF(Xc,fc[i],f[i])
@@ -132,10 +142,24 @@ for i in range(0,n):
     yd=giaidieuche(y,fc[i])
     Yd,Fd=biendoiFourier(yd,Nc)
     Yl=LPF(Yd,f[i])
+    Yl=BPF(Yl,f[i],0)
     s.append(biendoiFouriernguoc(Yl))
+plt.figure(1)
+plt.suptitle('Tín hiệu sau khi tách kênh của tín hiệu lần lượt là')
 for i in range(0,len(s)):
     subplot(len(s),1,i+1)
     plot(tc,s[i])
-SNR=SNR(Sd,Nd)
-print("SNR=",SNR)
+plt.figure(2)
+plt.suptitle('Dạng sóng và phổ của tín hiệu sau khi ghép kênh')
+subplot(211)
+plot(tc,xc)
+xlabel('t')
+ylabel('xc(t)')
+subplot(212)
+plot(Fc,abs(Xc))
+xlabel('f')
+ylabel('Xc(f)')
+plot(tc,s[i])
+SNR=SNR(Pd,Nd)
+print("SNR=",SNR,'dB')
 show()
