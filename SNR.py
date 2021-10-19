@@ -15,9 +15,8 @@ N= fs*duration
 Gn= 1e-10
 #ngõ vào
 def noise(f,tc):
-    snr_lt=3 #db
-    k=float(1/(power(10,snr_lt/10)))
-    nhieu=np.random.normal(0,k*max(f),len(tc))
+    #giả sử kênh truyền có nhiễu ngẫu nhiên với N0=1
+    nhieu=np.random.normal(0,1,len(tc))
     Noi=fft(nhieu)
     Nd=0
     for i in Noi:
